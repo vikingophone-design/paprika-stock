@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Paprika Stock">
 <meta name="theme-color" content="#e10600">
-<title>Paprika Stock V8</title>
+<title>Paprika Stock V8.1</title>
 <style>
 :root {
   --red:#e10600; --red2:#970000; --bg:#090909; --panel:#171717; --card:#202020;
@@ -273,7 +273,15 @@ function renderProducts(){
         <div class="num"><label>Mínimo</label><div class="readOnlyNum">${money(p.min)}</div><small>${escapeHtml(p.unit)}</small></div>
         <div class="num"><label>Ideal</label><div class="readOnlyNum">${money(p.ideal)}</div><small>${escapeHtml(p.unit)}</small></div>
       </div>
-      <div class="buyNeed">Comprar: ${money(buyQty(p))} ${escapeHtml(p.unit)}</div>
+      <div class="buyNeed">
+        <div>Comprar: ${money(buyQty(p))} ${escapeHtml(p.unit)}</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+          <label class="meta" style="font-weight:900">Compra manual</label>
+          <input type="number" step="0.01" value="${p.buyQty ?? ''}" placeholder="Auto" style="width:110px;border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:12px;padding:9px;font-weight:900" onchange="updateProduct(${p.id},'buyQty',this.value)">
+          <button class="smallBtn" onclick="clearManualBuy(${p.id})">Auto</button>
+        </div>
+        <div class="meta" style="margin-top:8px;color:var(--muted)">Tocá el nombre para editar mínimo, ideal, unidad o proveedor.</div>
+      </div>
       <div class="advancedEdit ${isEditing?'open':''}">
         <div class="meta" style="margin-bottom:8px">Edición avanzada</div>
         <input class="prodName" value="${escapeAttr(p.name)}" onchange="updateProduct(${p.id},'name',this.value)" placeholder="Nombre">
