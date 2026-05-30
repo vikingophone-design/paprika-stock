@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Paprika Stock">
 <meta name="theme-color" content="#e10600">
-<title>Paprika Stock V7</title>
+<title>Paprika Stock V8</title>
 <style>
 :root {
   --red:#e10600; --red2:#970000; --bg:#090909; --panel:#171717; --card:#202020;
@@ -48,6 +48,13 @@ h2{font-size:30px;margin:0;font-weight:1000;letter-spacing:-1px} h3{margin:0;fon
 .photoBox{width:82px;height:82px;flex:0 0 82px;border-radius:18px;background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:30px;font-weight:1000;color:var(--red)}
 .photoBox img{width:100%;height:100%;object-fit:cover}
 .prodName{width:100%;border:0;background:transparent;color:var(--text);font-size:22px;font-weight:1000;outline:none;padding:0;margin:0 0 2px}
+.prodTitle{border:0;background:transparent;color:var(--text);font-size:22px;font-weight:1000;outline:none;padding:0;margin:0 0 2px;text-align:left;width:100%;line-height:1.1}
+.prodTitle:hover{color:var(--red)}
+.advancedEdit{display:none;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
+.advancedEdit.open{display:block}
+.readOnlyNum{font-size:24px;font-weight:1000;color:var(--text);line-height:1.15}
+.buyQtyInput{width:92px;text-align:right;border:1px solid var(--line);background:var(--input);color:var(--text);font-size:24px;font-weight:1000;border-radius:14px;padding:8px;outline:none}
+.buyCheck{border:0;background:transparent;color:var(--text);font-size:24px;padding:4px;cursor:pointer}
 .meta{color:var(--muted);font-size:13px;font-weight:700}
 .badge{border-radius:999px;padding:7px 10px;font-weight:1000;font-size:12px;border:1px solid}
 .badge.ok{color:var(--ok);border-color:rgba(22,163,74,.55);background:rgba(22,163,74,.10)}
@@ -213,12 +220,16 @@ let products = load('paprika_products_v7', DEFAULT_PRODUCTS);
 let selectedCat = localStorage.getItem('paprika_selectedCat_v7') || 'todos';
 let hideBought = false;
 let activeTab = 'stock';
+let editingProductId = null;
 
 function load(key,fallback){ try{ return JSON.parse(localStorage.getItem(key)) || structuredClone(fallback); }catch(e){ return structuredClone(fallback); } }
 function save(){ localStorage.setItem('paprika_categories_v7',JSON.stringify(categories)); localStorage.setItem('paprika_products_v7',JSON.stringify(products)); localStorage.setItem('paprika_selectedCat_v7',selectedCat); }
 function money(n){ return (Number(n)||0).toLocaleString('es-AR',{maximumFractionDigits:2}); }
 function catById(id){ return categories.find(c=>c.id===id) || {name:'Sin categoría',icon:'📦'}; }
-function buyQty(p){ return Math.max(0,(Number(p.ideal)||0)-(Number(p.current)||0)); }
+function buyQty(p){
+  if(p.buyQty !== undefined && p.buyQty !== null && p.buyQty !== '') return Math.max(0, Number(p.buyQty)||0);
+  return Math.max(0,(Number(p.ideal)||0)-(Number(p.current)||0));
+}
 function status(p){ if((Number(p.current)||0) <= (Number(p.min)||0)) return ['Urgente','bad']; if((Number(p.current)||0) < (Number(p.ideal)||0)) return ['Bajo','warn']; return ['OK','ok']; }
 function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
 function escapeAttr(s){ return escapeHtml(s).replace(/`/g,'&#096;'); }
@@ -245,38 +256,49 @@ function renderProducts(){
   document.getElementById('products').innerHTML = filtered.map(p=>{
     const [st,cls]=status(p); const cat=catById(p.category);
     const ph = p.name.trim().charAt(0).toUpperCase() || 'P';
+    const isEditing = editingProductId === p.id;
     return `<article class="product">
       <div class="productTop">
-        <label class="photoBox" title="Cambiar foto">
+        <div class="photoBox" title="Foto del producto">
           ${p.img ? `<img src="${p.img}" alt="">` : `<span>${escapeHtml(ph)}</span>`}
-          <input class="hiddenFile" type="file" accept="image/*" onchange="setProductImage(${p.id},event)">
-        </label>
+        </div>
         <div style="flex:1;min-width:0">
-          <input class="prodName" value="${escapeAttr(p.name)}" onchange="updateProduct(${p.id},'name',this.value)" placeholder="Nombre">
+          <button class="prodTitle" onclick="toggleProductEdit(${p.id})" title="Tocar para editar datos avanzados">${escapeHtml(p.name)}</button>
           <div class="meta">${cat.name} · ${escapeHtml(p.supplier||'Sin proveedor')}</div>
         </div>
         <span class="badge ${cls}">${st}</span>
       </div>
       <div class="nums">
         <div class="num"><label>Stock</label><input type="number" step="0.01" value="${p.current}" onchange="updateProduct(${p.id},'current',this.value)"><small>${escapeHtml(p.unit)}</small></div>
-        <div class="num"><label>Mínimo</label><input type="number" step="0.01" value="${p.min}" onchange="updateProduct(${p.id},'min',this.value)"><small>${escapeHtml(p.unit)}</small></div>
-        <div class="num"><label>Ideal</label><input type="number" step="0.01" value="${p.ideal}" onchange="updateProduct(${p.id},'ideal',this.value)"><small>${escapeHtml(p.unit)}</small></div>
-      </div>
-      <div class="editRow">
-        <select onchange="updateProduct(${p.id},'category',this.value)">${categories.map(c=>`<option value="${c.id}" ${p.category===c.id?'selected':''}>${c.icon} ${escapeHtml(c.name)}</option>`).join('')}</select>
-        <input value="${escapeAttr(p.unit)}" placeholder="Unidad" onchange="updateProduct(${p.id},'unit',this.value)">
-        <input value="${escapeAttr(p.supplier||'')}" placeholder="Proveedor" onchange="updateProduct(${p.id},'supplier',this.value)">
-      </div>
-      <div class="actionsRow">
-        <button class="smallBtn" onclick="triggerImage(${p.id})">📷 Foto</button>
-        ${p.img ? `<button class="smallBtn" onclick="removeImage(${p.id})">Quitar foto</button>` : ''}
-        <button class="smallBtn red" onclick="deleteProduct(${p.id})">Eliminar</button>
+        <div class="num"><label>Mínimo</label><div class="readOnlyNum">${money(p.min)}</div><small>${escapeHtml(p.unit)}</small></div>
+        <div class="num"><label>Ideal</label><div class="readOnlyNum">${money(p.ideal)}</div><small>${escapeHtml(p.unit)}</small></div>
       </div>
       <div class="buyNeed">Comprar: ${money(buyQty(p))} ${escapeHtml(p.unit)}</div>
+      <div class="advancedEdit ${isEditing?'open':''}">
+        <div class="meta" style="margin-bottom:8px">Edición avanzada</div>
+        <input class="prodName" value="${escapeAttr(p.name)}" onchange="updateProduct(${p.id},'name',this.value)" placeholder="Nombre">
+        <div class="editRow">
+          <select onchange="updateProduct(${p.id},'category',this.value)">${categories.map(c=>`<option value="${c.id}" ${p.category===c.id?'selected':''}>${c.icon} ${escapeHtml(c.name)}</option>`).join('')}</select>
+          <input value="${escapeAttr(p.unit)}" placeholder="Unidad" onchange="updateProduct(${p.id},'unit',this.value)">
+          <input value="${escapeAttr(p.supplier||'')}" placeholder="Proveedor" onchange="updateProduct(${p.id},'supplier',this.value)">
+        </div>
+        <div class="editRow">
+          <input type="number" step="0.01" value="${p.min}" placeholder="Mínimo" onchange="updateProduct(${p.id},'min',this.value)">
+          <input type="number" step="0.01" value="${p.ideal}" placeholder="Ideal" onchange="updateProduct(${p.id},'ideal',this.value)">
+          <input type="number" step="0.01" value="${p.buyQty ?? ''}" placeholder="Compra manual" onchange="updateProduct(${p.id},'buyQty',this.value)">
+        </div>
+        <div class="actionsRow">
+          <button class="smallBtn" onclick="triggerImage(${p.id})">📷 Foto</button>
+          ${p.img ? `<button class="smallBtn" onclick="removeImage(${p.id})">Quitar foto</button>` : ''}
+          <button class="smallBtn" onclick="clearManualBuy(${p.id})">Compra automática</button>
+          <button class="smallBtn red" onclick="deleteProduct(${p.id})">Eliminar</button>
+        </div>
+        <input id="fileInput-${p.id}" class="hiddenFile" type="file" accept="image/*" onchange="setProductImage(${p.id},event)">
+      </div>
     </article>`;
   }).join('') || '<p class="meta">No hay productos para mostrar.</p>';
 }
-function triggerImage(id){ const input=[...document.querySelectorAll('.photoBox input')].find(inp=>inp.getAttribute('onchange')?.includes(`(${id},`)); if(input) input.click(); }
+function triggerImage(id){ const input=document.getElementById('fileInput-'+id); if(input) input.click(); }
 function setProductImage(id,ev){
   const file=ev.target.files[0]; if(!file) return;
   const reader=new FileReader();
@@ -289,17 +311,23 @@ function renderBuy(){
   const grouped={}; list.forEach(p=>{ const k=p.supplier||'Sin proveedor'; (grouped[k] ||= []).push(p); });
   document.getElementById('buyList').innerHTML = Object.entries(grouped).map(([sup,items])=>`
     <div class="buyGroup"><div class="buyHead">${escapeHtml(sup)}</div>
-    ${items.map(i=>`<button class="buyItem ${i.purchased?'done':''}" onclick="togglePurchased(${i.id})">
-      <div><strong>${i.purchased?'✅':'⬜'} ${escapeHtml(i.name)}</strong><div class="meta">Actual: ${money(i.current)} · Ideal: ${money(i.ideal)} · ${catById(i.category).name}</div></div>
-      <div><div class="qty">${money(i.buy)}</div><div class="meta" style="text-align:right">${escapeHtml(i.unit)}</div></div>
-    </button>`).join('')}</div>`).join('') || '<p class="meta">No hay faltantes para comprar.</p>';
+    ${items.map(i=>`<div class="buyItem ${i.purchased?'done':''}">
+      <button class="buyCheck" onclick="togglePurchased(${i.id})">${i.purchased?'✅':'⬜'}</button>
+      <div style="flex:1;min-width:0"><strong>${escapeHtml(i.name)}</strong><div class="meta">Actual: ${money(i.current)} · Ideal: ${money(i.ideal)} · ${catById(i.category).name}</div></div>
+      <div style="text-align:right"><input class="buyQtyInput" type="number" step="0.01" value="${i.buy}" onchange="updateProduct(${i.id},'buyQty',this.value)"><div class="meta" style="text-align:right">${escapeHtml(i.unit)}</div></div>
+    </div>`).join('')}</div>`).join('') || '<p class="meta">No hay faltantes para comprar.</p>';
   document.getElementById('hideBtn').textContent = hideBought ? 'Mostrar comprados' : 'Ocultar comprados';
 }
+function toggleProductEdit(id){ editingProductId = editingProductId===id ? null : id; renderProducts(); }
+function clearManualBuy(id){ products=products.map(p=>p.id===id?{...p,buyQty:null}:p); save(); render(); toast('Compra automática activada'); }
 function selectCat(id){ selectedCat=id; save(); render(); }
-function updateProduct(id,field,value){ products=products.map(p=>p.id===id?{...p,[field]:['current','min','ideal'].includes(field)?Number(value):value}:p); save(); render(); }
+function updateProduct(id,field,value){
+  products=products.map(p=>p.id===id?{...p,[field]:['current','min','ideal','buyQty'].includes(field)?(value===''?null:Number(value)):value}:p);
+  save(); render();
+}
 function addProduct(){
   const name=document.getElementById('newName').value.trim(); if(!name) return alert('Poné un nombre de producto.');
-  products.push({id:Date.now(),name,category:document.getElementById('newCategory').value,unit:document.getElementById('newUnit').value||'unidades',supplier:document.getElementById('newSupplier').value,current:Number(document.getElementById('newCurrent').value)||0,min:Number(document.getElementById('newMin').value)||0,ideal:Number(document.getElementById('newIdeal').value)||0,purchased:false,img:''});
+  products.push({id:Date.now(),name,category:document.getElementById('newCategory').value,unit:document.getElementById('newUnit').value||'unidades',supplier:document.getElementById('newSupplier').value,current:Number(document.getElementById('newCurrent').value)||0,min:Number(document.getElementById('newMin').value)||0,ideal:Number(document.getElementById('newIdeal').value)||0,purchased:false,img:'',buyQty:null});
   ['newName','newSupplier'].forEach(id=>document.getElementById(id).value=''); save(); render(); toast('Producto agregado');
 }
 function deleteProduct(id){ if(confirm('¿Eliminar este producto?')){ products=products.filter(p=>p.id!==id); save(); render(); } }
@@ -328,7 +356,7 @@ function exportShoppingPDF(){
   w.document.close();
 }
 function exportBackup(){
-  const data={version:'Paprika Stock V7',date:new Date().toISOString(),categories,products,theme:localStorage.getItem('paprika_theme_v7')||'dark'};
+  const data={version:'Paprika Stock V8',date:new Date().toISOString(),categories,products,theme:localStorage.getItem('paprika_theme_v7')||'dark'};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup_paprika_stock_'+new Date().toISOString().slice(0,10)+'.json'; a.click(); URL.revokeObjectURL(a.href); toast('Backup descargado');
 }
 function importBackup(ev){

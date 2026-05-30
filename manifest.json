@@ -1,7 +1,7 @@
 {
-  "name": "Paprika Stock",
+  "name": "Paprika Stock V8",
   "short_name": "Paprika Stock",
-  "start_url": "./",
+  "start_url": "./?v=8",
   "display": "standalone",
   "background_color": "#090909",
   "theme_color": "#e10600",
