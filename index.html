@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Paprika Stock">
 <meta name="theme-color" content="#e10600">
-<title>Paprika Stock V8.1</title>
+<title>Paprika Stock V9</title>
 <style>
 :root {
   --red:#e10600; --red2:#970000; --bg:#090909; --panel:#171717; --card:#202020;
@@ -48,7 +48,9 @@ h2{font-size:30px;margin:0;font-weight:1000;letter-spacing:-1px} h3{margin:0;fon
 .photoBox{width:82px;height:82px;flex:0 0 82px;border-radius:18px;background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:30px;font-weight:1000;color:var(--red)}
 .photoBox img{width:100%;height:100%;object-fit:cover}
 .prodName{width:100%;border:0;background:transparent;color:var(--text);font-size:22px;font-weight:1000;outline:none;padding:0;margin:0 0 2px}
-.prodTitle{border:0;background:transparent;color:var(--text);font-size:22px;font-weight:1000;outline:none;padding:0;margin:0 0 2px;text-align:left;width:100%;line-height:1.1}
+.prodTitle{border:0;background:transparent;color:var(--text);font-size:22px;font-weight:1000;outline:none;padding:0;margin:0 0 2px;text-align:left;width:100%;line-height:1.1;display:flex;align-items:center;gap:8px;cursor:pointer}
+.chev{font-size:14px;opacity:.75;transition:.18s transform}
+.chev.open{transform:rotate(180deg)}
 .prodTitle:hover{color:var(--red)}
 .advancedEdit{display:none;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
 .advancedEdit.open{display:block}
@@ -263,24 +265,21 @@ function renderProducts(){
           ${p.img ? `<img src="${p.img}" alt="">` : `<span>${escapeHtml(ph)}</span>`}
         </div>
         <div style="flex:1;min-width:0">
-          <button class="prodTitle" onclick="toggleProductEdit(${p.id})" title="Tocar para editar datos avanzados">${escapeHtml(p.name)}</button>
+          <button class="prodTitle" onclick="toggleProductEdit(${p.id})" title="Tocar para abrir edición avanzada"><span>${escapeHtml(p.name)}</span><span class="chev ${isEditing?'open':''}">▼</span></button>
           <div class="meta">${cat.name} · ${escapeHtml(p.supplier||'Sin proveedor')}</div>
         </div>
         <span class="badge ${cls}">${st}</span>
       </div>
       <div class="nums">
         <div class="num"><label>Stock</label><input type="number" step="0.01" value="${p.current}" onchange="updateProduct(${p.id},'current',this.value)"><small>${escapeHtml(p.unit)}</small></div>
-        <div class="num"><label>Mínimo</label><div class="readOnlyNum">${money(p.min)}</div><small>${escapeHtml(p.unit)}</small></div>
-        <div class="num"><label>Ideal</label><div class="readOnlyNum">${money(p.ideal)}</div><small>${escapeHtml(p.unit)}</small></div>
+        <div class="num"><label>Comprar</label><input type="number" step="0.01" value="${buyQty(p)}" onchange="updateProduct(${p.id},'buyQty',this.value)"><small>${escapeHtml(p.unit)} · ${p.buyQty !== undefined && p.buyQty !== null && p.buyQty !== '' ? 'manual' : 'auto'}</small></div>
       </div>
       <div class="buyNeed">
-        <div>Comprar: ${money(buyQty(p))} ${escapeHtml(p.unit)}</div>
+        <div>${p.buyQty !== undefined && p.buyQty !== null && p.buyQty !== '' ? 'Compra manual activa' : 'Compra automática por stock ideal'}</div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
-          <label class="meta" style="font-weight:900">Compra manual</label>
-          <input type="number" step="0.01" value="${p.buyQty ?? ''}" placeholder="Auto" style="width:110px;border:1px solid var(--line);background:var(--input);color:var(--text);border-radius:12px;padding:9px;font-weight:900" onchange="updateProduct(${p.id},'buyQty',this.value)">
-          <button class="smallBtn" onclick="clearManualBuy(${p.id})">Auto</button>
+          <button class="smallBtn" onclick="clearManualBuy(${p.id})">Volver a automático</button>
+          <span class="meta">Tocá el nombre para editar mínimo, ideal, unidad o proveedor.</span>
         </div>
-        <div class="meta" style="margin-top:8px;color:var(--muted)">Tocá el nombre para editar mínimo, ideal, unidad o proveedor.</div>
       </div>
       <div class="advancedEdit ${isEditing?'open':''}">
         <div class="meta" style="margin-bottom:8px">Edición avanzada</div>
@@ -291,9 +290,9 @@ function renderProducts(){
           <input value="${escapeAttr(p.supplier||'')}" placeholder="Proveedor" onchange="updateProduct(${p.id},'supplier',this.value)">
         </div>
         <div class="editRow">
-          <input type="number" step="0.01" value="${p.min}" placeholder="Mínimo" onchange="updateProduct(${p.id},'min',this.value)">
-          <input type="number" step="0.01" value="${p.ideal}" placeholder="Ideal" onchange="updateProduct(${p.id},'ideal',this.value)">
-          <input type="number" step="0.01" value="${p.buyQty ?? ''}" placeholder="Compra manual" onchange="updateProduct(${p.id},'buyQty',this.value)">
+          <label><span class="meta">Stock mínimo</span><input type="number" step="0.01" value="${p.min}" placeholder="Mínimo" onchange="updateProduct(${p.id},'min',this.value)"></label>
+          <label><span class="meta">Stock ideal</span><input type="number" step="0.01" value="${p.ideal}" placeholder="Ideal" onchange="updateProduct(${p.id},'ideal',this.value)"></label>
+          <label><span class="meta">Compra manual</span><input type="number" step="0.01" value="${p.buyQty ?? ''}" placeholder="Compra manual" onchange="updateProduct(${p.id},'buyQty',this.value)"></label>
         </div>
         <div class="actionsRow">
           <button class="smallBtn" onclick="triggerImage(${p.id})">📷 Foto</button>
@@ -364,7 +363,7 @@ function exportShoppingPDF(){
   w.document.close();
 }
 function exportBackup(){
-  const data={version:'Paprika Stock V8',date:new Date().toISOString(),categories,products,theme:localStorage.getItem('paprika_theme_v7')||'dark'};
+  const data={version:'Paprika Stock V9',date:new Date().toISOString(),categories,products,theme:localStorage.getItem('paprika_theme_v7')||'dark'};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup_paprika_stock_'+new Date().toISOString().slice(0,10)+'.json'; a.click(); URL.revokeObjectURL(a.href); toast('Backup descargado');
 }
 function importBackup(ev){
