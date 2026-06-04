@@ -1,9 +1,9 @@
 {
   "name": "Paprika Control PRO",
   "short_name": "Paprika PRO",
-  "start_url": "./index.html?v=15.1",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fff8f1",
   "theme_color": "#d90000",
-  "orientation": "portrait"
+  "icons": []
 }
