@@ -1,0 +1,213 @@
+{
+  "theme": "dark",
+  "selectedMonth": "2026-06",
+  "selectedDate": "2026-06-03",
+  "sales": {
+    "2026-06-04": 444000,
+    "2026-06-03": 444000
+  },
+  "cash": {
+    "2026-06-04": {
+      "efectivo": 118000,
+      "trans": 246000,
+      "mp": 0,
+      "apps": 80000
+    },
+    "2026-06-03": {
+      "efectivo": 118000,
+      "trans": 246000,
+      "mp": 0,
+      "apps": 80000
+    }
+  },
+  "expenses": [
+    {
+      "id": 100,
+      "date": "2026-06-05",
+      "cat": "Packaging",
+      "name": "Papelera / packaging",
+      "qty": 1,
+      "unit": "compra",
+      "amount": 48000
+    },
+    {
+      "id": 1780620708138,
+      "date": "2026-06-05",
+      "cat": "Mercadería",
+      "name": "Limpieza",
+      "qty": "12000",
+      "unit": "1",
+      "amount": 12000
+    },
+    {
+      "id": 1780620732658,
+      "date": "2026-06-05",
+      "cat": "Mercadería",
+      "name": "Verdu",
+      "qty": "1",
+      "unit": "",
+      "amount": 3900
+    },
+    {
+      "id": 1780620757165,
+      "date": "2026-06-05",
+      "cat": "Mercadería",
+      "name": "Miel y portobello",
+      "qty": "1",
+      "unit": "1",
+      "amount": 15000
+    },
+    {
+      "id": 1780620804195,
+      "date": "2026-06-05",
+      "cat": "Mercadería",
+      "name": "Cocas",
+      "qty": "1",
+      "unit": "1",
+      "amount": 4000
+    },
+    {
+      "id": 1780698342680,
+      "date": "2026-06-03",
+      "cat": "Mercadería",
+      "name": "Polleria",
+      "qty": "1",
+      "unit": "1",
+      "amount": 15509
+    },
+    {
+      "id": 1780698366714,
+      "date": "2026-06-05",
+      "cat": "Mercadería",
+      "name": "Pablo",
+      "qty": "1",
+      "unit": "1",
+      "amount": 488000
+    },
+    {
+      "id": 1780698378379,
+      "date": "2026-06-05",
+      "cat": "Mercadería",
+      "name": "102000",
+      "qty": "1",
+      "unit": "1",
+      "amount": 102000
+    },
+    {
+      "id": 1780698411345,
+      "date": "2026-06-05",
+      "cat": "Mercadería",
+      "name": "Verduleria",
+      "qty": "31000",
+      "unit": "1",
+      "amount": 31000
+    }
+  ],
+  "category": "Todos",
+  "products": [
+    {
+      "id": 1,
+      "name": "Medallón simple",
+      "cat": "Medallones",
+      "unit": "unidades",
+      "supplier": "Carnicería",
+      "stock": 75,
+      "min": 100,
+      "ideal": 200,
+      "buyManual": true,
+      "buy": 125,
+      "bought": false
+    },
+    {
+      "id": 2,
+      "name": "Pan de papa",
+      "cat": "Panes",
+      "unit": "unidades",
+      "supplier": "Panadería",
+      "stock": 80,
+      "min": 70,
+      "ideal": 150,
+      "buyManual": false,
+      "buy": 70,
+      "bought": false
+    },
+    {
+      "id": 3,
+      "name": "Papas",
+      "cat": "Papas",
+      "unit": "cajas",
+      "supplier": "Mayorista",
+      "stock": 4,
+      "min": 3,
+      "ideal": 8,
+      "buyManual": false,
+      "buy": 4,
+      "bought": false
+    },
+    {
+      "id": 4,
+      "name": "Tequeños",
+      "cat": "Fritura",
+      "unit": "unidades",
+      "supplier": "Mayorista",
+      "stock": 18,
+      "min": 20,
+      "ideal": 60,
+      "buyManual": false,
+      "buy": 42,
+      "bought": false
+    },
+    {
+      "id": 5,
+      "name": "Gio de frambuesa",
+      "cat": "Postres",
+      "unit": "unidades",
+      "supplier": "Postres",
+      "stock": 0,
+      "min": 0,
+      "ideal": 0,
+      "buyManual": true,
+      "buy": 0,
+      "bought": false
+    },
+    {
+      "id": 6,
+      "name": "Aluminio para papas",
+      "cat": "Packaging",
+      "unit": "paquetes",
+      "supplier": "Papelera",
+      "stock": 1,
+      "min": 2,
+      "ideal": 5,
+      "buyManual": false,
+      "buy": 4,
+      "bought": false
+    },
+    {
+      "id": 7,
+      "name": "Andes IPA",
+      "cat": "Cervezas",
+      "unit": "unidades",
+      "supplier": "Bebidas",
+      "stock": 0,
+      "min": 0,
+      "ideal": 0,
+      "buyManual": true,
+      "buy": 0,
+      "bought": false
+    },
+    {
+      "id": 8,
+      "name": "Cheddar barra",
+      "cat": "Quesos",
+      "unit": "kg",
+      "supplier": "Mayorista",
+      "stock": 0,
+      "min": 0,
+      "ideal": 0,
+      "buyManual": true,
+      "buy": 0,
+      "bought": false
+    }
+  ]
+}
