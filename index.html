@@ -118,6 +118,10 @@ html, body { overflow-x:hidden; }
 .sideDrawer.open{transform:translateX(0)}
 .drawerHead{display:flex;align-items:center;gap:12px;margin-bottom:16px}.drawerLogo{width:58px;height:58px;border-radius:18px;background:#111;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line)}.drawerLogo img{width:100%;height:100%;object-fit:contain}.drawerHead h2{margin:0;font-size:22px}.drawerHead p{margin:2px 0 0;color:var(--muted);font-weight:700}.drawerClose{margin-left:auto;background:var(--panel2);border:1px solid var(--line);border-radius:14px;color:var(--text);width:42px;height:42px;font-size:22px;font-weight:900}.drawerGroup{margin:14px 0}.drawerLabel{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);font-weight:950;margin:0 0 8px 4px}.drawerItem{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:17px;color:var(--text);padding:13px 14px;margin:8px 0;font-weight:900}.drawerItem span{font-size:23px;width:28px;text-align:center}.drawerItem.danger{background:#fff0f0;color:#b91c1c;border-color:#ffd0d0}.drawerFoot{margin-top:16px;color:var(--muted);font-size:12px;font-weight:700;line-height:1.35}.dark .drawerItem.danger{background:#2b1515;color:#ffb4b4;border-color:#4d2222}
 
+
+.dayKpis{grid-template-columns:repeat(4,1fr)}
+.dayKpis .kpiCard{min-height:auto;padding:13px 10px}.dayKpis .kpiCard h3{font-size:13px}.dayKpis .kpiCard b{font-size:21px}
+@media (max-width:700px){.dayKpis{grid-template-columns:repeat(2,1fr)}.dayKpis .kpiCard{min-height:112px}.dayKpis .kpiCard b{font-size:24px}}
 </style>
 </head>
 <body>
@@ -180,7 +184,7 @@ html, body { overflow-x:hidden; }
 <section id="stock" class="section"><div class="panel"><h2>Stock y compras</h2><input id="search" class="field" placeholder="Buscar producto..." oninput="renderStock()"><div id="chips" class="chips"></div><div id="stockList"></div></div><div class="panel"><h2>Agregar producto</h2><div class="formGrid"><input id="pName" class="field" placeholder="Producto"><input id="pCat" class="field" placeholder="Categoría"><input id="pUnit" class="field" placeholder="Unidad"><input id="pSupplier" class="field" placeholder="Proveedor"><input id="pMin" class="field" type="number" placeholder="Mínimo"><input id="pIdeal" class="field" type="number" placeholder="Ideal"></div><button class="btn" style="margin-top:10px" onclick="addProduct()">Agregar producto</button></div></section>
 <section id="shopping" class="section"><div class="panel"><h2>Lista de compras</h2><div class="row wrap"><button class="btn" onclick="copyShopping()">Copiar WhatsApp</button><button class="btn secondary" onclick="resetBought()">Reiniciar checks</button></div><div id="shoppingList"></div></div></section>
 <section id="expenses" class="section"><div class="panel"><h2>Cargar gasto</h2><div class="formGrid"><input id="gName" class="field" placeholder="Detalle: medallones, aluminio"><select id="gCat" class="field"><option>Mercadería</option><option>Empleados</option><option>Servicios</option><option>Packaging</option><option>Mantenimiento</option><option>Otros</option></select><input id="gQty" class="field" type="number" placeholder="Cantidad"><input id="gUnit" class="field" placeholder="Unidad"><input id="gAmount" class="field" type="number" placeholder="Total $"><input id="gDate" class="field" type="date"></div><button class="btn" style="margin-top:10px" onclick="addExpense()">Agregar gasto</button></div><div class="panel"><h2>Gastos del mes</h2><div id="expenseList"></div></div></section>
-<section id="calendarSec" class="section"><div class="panel"><h2>Calendario mensual</h2><p class="muted" style="margin-top:-6px">Tocá un día para editar sus ventas directamente.</p><div id="calendar" class="calendar"></div></div><div class="panel" id="calendarEditor"><h2 id="calTitle">Editar día</h2><p class="muted" style="margin-top:-6px">Modificá la caja del día seleccionado y guardá los cambios.</p><div class="formGrid"><input id="calDate" class="field" type="date" onchange="selectCalendarDate(this.value)"><input id="calEfectivo" class="field" type="number" placeholder="Efectivo $"><input id="calTrans" class="field" type="number" placeholder="Transferencia $"><input id="calMP" class="field" type="number" placeholder="Mercado Pago $"><input id="calApps" class="field" type="number" placeholder="Apps delivery $"></div><div class="row wrap" style="margin-top:10px"><button class="btn" onclick="saveCalendarCash()">Guardar ventas del día</button><button class="btn secondary" onclick="show('cash')">Abrir caja completa</button></div></div></section>
+<section id="calendarSec" class="section"><div class="panel"><h2>Calendario mensual</h2><p class="muted" style="margin-top:-6px">Tocá cualquier día para ver ventas, gastos, categorías y ganancia estimada.</p><div id="calendar" class="calendar"></div></div><div class="panel" id="calendarEditor"><h2 id="calTitle">Editar día</h2><p class="muted" style="margin-top:-6px">Modificá la caja del día seleccionado y guardá los cambios.</p><div class="formGrid"><input id="calDate" class="field" type="date" onchange="selectCalendarDate(this.value)"><input id="calEfectivo" class="field" type="number" placeholder="Efectivo $"><input id="calTrans" class="field" type="number" placeholder="Transferencia $"><input id="calMP" class="field" type="number" placeholder="Mercado Pago $"><input id="calApps" class="field" type="number" placeholder="Apps delivery $"></div><div class="row wrap" style="margin-top:10px"><button class="btn" onclick="saveCalendarCash()">Guardar ventas del día</button><button class="btn secondary" onclick="show('cash')">Abrir caja completa</button><button class="btn secondary" onclick="prepExpenseForSelectedDay()">Agregar gasto en este día</button></div></div><div class="panel" id="dayBreakdownPanel"><h2 id="dayBreakdownTitle">Detalle del día</h2><div id="dayBreakdown"></div></div></section>
 <section id="reports" class="section"><div class="panel"><h2>Reportes</h2><div id="reportText"></div></div><div class="panel"><h2>Backup</h2><div class="row wrap"><button class="btn" onclick="exportData()">Exportar backup</button><label class="btn secondary">Importar<input type="file" accept="application/json" style="display:none" onchange="importData(event)"></label></div></div></section>
 </main>
 </div>
@@ -299,7 +303,40 @@ function saveCalendarCash(){
   alert('Ventas actualizadas para '+d.split('-').reverse().join('/'));
 }
 
-function renderCalendar(){let [y,m]=month().split('-').map(Number),days=new Date(y,m,0).getDate();calendar.innerHTML='';for(let i=1;i<=days;i++){let d=month()+'-'+String(i).padStart(2,'0');let ex=state.expenses.filter(e=>e.date===d).reduce((a,e)=>a+Number(e.amount||0),0);let b=document.createElement('button');b.className='day '+(d===state.selectedDate?'active':'');b.innerHTML=`<b>${i}</b><small>V ${money(salesDay(d))}</small><small>G ${money(ex)}</small>`;b.onclick=()=>selectCalendarDate(d);calendar.appendChild(b)}loadCalendarEditor()}
+
+function dayExpenses(d){return state.expenses.filter(e=>e.date===d)}
+function dayExpenseTotal(d){return dayExpenses(d).reduce((a,e)=>a+Number(e.amount||0),0)}
+function renderDayBreakdown(){
+  let d=state.selectedDate;
+  if(!document.getElementById('dayBreakdown')) return;
+  let sales=salesDay(d);
+  let exps=dayExpenses(d);
+  let totalExp=exps.reduce((a,e)=>a+Number(e.amount||0),0);
+  let profit=sales-totalExp;
+  dayBreakdownTitle.textContent='Detalle '+d.split('-').reverse().join('/');
+  let cats={};
+  exps.forEach(e=>{cats[e.cat]=(cats[e.cat]||0)+Number(e.amount||0)});
+  let catHtml=Object.keys(cats).length?Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,total])=>`<div class="listItem"><div style="flex:1"><b>${cat}</b><br><small class="muted">Gasto del día</small></div><div class="money">${money(total)}</div></div>`).join(''):'<p class="muted">Sin gastos cargados para este día.</p>';
+  let expHtml=exps.length?exps.slice().sort((a,b)=>Number(b.amount||0)-Number(a.amount||0)).map(e=>`<div class="expense"><div class="topline"><div><b>${e.name}</b><br><small class="muted">${e.cat}${e.qty?` · ${e.qty} ${e.unit||''}`:''}</small></div><div><span class="money">${money(e.amount)}</span><br><button class="btn secondary" onclick="delExpense(${e.id})" style="padding:7px 9px;margin-top:5px">Borrar</button></div></div></div>`).join(''):'<p class="muted">No hay detalle de gastos en este día.</p>';
+  dayBreakdown.innerHTML=`
+    <div class="kpiGrid dayKpis">
+      <div class="kpiCard"><h3>Ventas</h3><b>${money(sales)}</b></div>
+      <div class="kpiCard"><h3>Gastos</h3><b class="orangeTxt">${money(totalExp)}</b></div>
+      <div class="kpiCard"><h3>Ganancia estimada</h3><b class="${profit>=0?'greenTxt':''}">${money(profit)}</b></div>
+      <div class="kpiCard"><h3>Movimientos</h3><b>${exps.length}</b></div>
+    </div>
+    <h3 style="margin:16px 0 8px">Gastos por categoría</h3>
+    ${catHtml}
+    <h3 style="margin:16px 0 8px">Detalle de gastos</h3>
+    ${expHtml}`;
+}
+function prepExpenseForSelectedDay(){
+  gDate.value=state.selectedDate;
+  show('expenses');
+  setTimeout(()=>document.getElementById('gName')?.focus(),120);
+}
+
+function renderCalendar(){let [y,m]=month().split('-').map(Number),days=new Date(y,m,0).getDate();calendar.innerHTML='';for(let i=1;i<=days;i++){let d=month()+'-'+String(i).padStart(2,'0');let ex=dayExpenseTotal(d);let b=document.createElement('button');b.className='day '+(d===state.selectedDate?'active':'');b.innerHTML=`<b>${i}</b><small>V ${money(salesDay(d))}</small><small>G ${money(ex)}</small>`;b.onclick=()=>selectCalendarDate(d);calendar.appendChild(b)}loadCalendarEditor();renderDayBreakdown()}
 function renderReports(){let s=salesMonth(),e=expMonth(),p=s-e;reportText.innerHTML=`<div class="kpiGrid"><div class="kpiCard"><h3>Ventas</h3><b>${money(s)}</b></div><div class="kpiCard"><h3>Gastos</h3><b>${money(e)}</b></div><div class="kpiCard"><h3>Ganancia</h3><b class="${p>=0?'greenTxt':''}">${money(p)}</b></div><div class="kpiCard"><h3>Compras pendientes</h3><b>${state.products.filter(x=>buyQty(x)>0&&!x.bought).length}</b></div></div>`}
 function exportData(){let blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='paprika-control-pro-backup.json';a.click()}function importData(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{state=JSON.parse(r.result);save();init()};r.readAsText(f)}function renderAll(){renderHome();renderCash();renderExpenses();renderStock();renderShopping();renderCalendar();renderReports()}init();
 </script>
